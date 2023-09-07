@@ -33,7 +33,7 @@ class ExampleUnitTest {
 
     @Test(expected = Exception::class)
     fun givenNullPan_thenThrowsException() {
-        pinblock.encode(PinblockFormat.ISO_3, tooLongPin, null)
+        pinblock.encode(PinblockFormat.ISO_3, minPin, null)
     }
 
     @Test
