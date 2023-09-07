@@ -7,7 +7,7 @@ import kotlin.random.Random
  * This class manages the encoding and decoding of pin blocks
  *
  * */
-class Pinblock: IPinblock {
+class Pinblock : IPinblock {
 
     /**
      * Encodes [pin] and [pan] into a pin block based on [format]
@@ -28,7 +28,8 @@ class Pinblock: IPinblock {
                 pan?.let {
                     encodeISO(format, pin, it)
                 } ?: throw Exception("{$format} requires a valid PAN")
-            } else -> {
+            }
+            else -> {
                 throw Exception("Algorithm not yet implemented")
             }
         }
@@ -39,11 +40,12 @@ class Pinblock: IPinblock {
      * @return the string of the pin.
      */
     override fun decode(pinblock: String, pan: String): String {
-        return when(pinblock.first().digitToInt().toByte()) {
+        return when (pinblock.first().digitToInt().toByte()) {
             PinblockFormat.ISO_0.marker,
             PinblockFormat.ISO_3.marker -> {
                 decodeISO(pinblock, pan)
-            } else -> {
+            }
+            else -> {
                 throw Exception("Algorithm not yet implemented")
             }
         }
@@ -73,7 +75,7 @@ class Pinblock: IPinblock {
             }
         }
         var panBytesIndex = 4
-        for (panChar in pan.substring(pan.length-13, pan.length-1)) {
+        for (panChar in pan.substring(pan.length - 13, pan.length - 1)) {
             panNibbles[panBytesIndex] = panChar.digitToInt().toByte()
             panBytesIndex++
             if (panBytesIndex == NUMNIBBLES) {
@@ -81,12 +83,13 @@ class Pinblock: IPinblock {
             }
         }
         for (pinBlockIndex in 0 until NUMNIBBLES) {
-            pinblockNibbles[pinBlockIndex] = pinNibbles[pinBlockIndex].xor(panNibbles[pinBlockIndex])
+            pinblockNibbles[pinBlockIndex] =
+                pinNibbles[pinBlockIndex].xor(panNibbles[pinBlockIndex])
         }
         return pinblockNibbles.joinToString("") { byte -> "%X".format(byte) }
     }
 
-    private fun charToNibble(char: Char) : Byte {
+    private fun charToNibble(char: Char): Byte {
         val values = "0123456789ABCDEF"
         return values.indexOf(char).toByte()
     }
@@ -94,11 +97,11 @@ class Pinblock: IPinblock {
     private fun decodeISO(pinblock: String, pan: String): String {
         val panNibbles = ByteArray(NUMNIBBLES)
         val pinblockNibbles = pinblock.map {
-                charToNibble(it)
-            }.toByteArray()
+            charToNibble(it)
+        }.toByteArray()
         val pinNibbles = ByteArray(NUMNIBBLES)
         var panNibblesIndex = 4
-        for (panChar in pan.substring(pan.length-13, pan.length-1)) {
+        for (panChar in pan.substring(pan.length - 13, pan.length - 1)) {
             panNibbles[panNibblesIndex] = panChar.digitToInt().toByte()
             panNibblesIndex++
             if (panNibblesIndex == NUMNIBBLES) {
@@ -106,7 +109,8 @@ class Pinblock: IPinblock {
             }
         }
         for (pinBlockIndex in 0 until NUMNIBBLES) {
-            pinNibbles[pinBlockIndex] = pinblockNibbles[pinBlockIndex].xor(panNibbles[pinBlockIndex])
+            pinNibbles[pinBlockIndex] =
+                pinblockNibbles[pinBlockIndex].xor(panNibbles[pinBlockIndex])
         }
         val pinLength = pinNibbles[1].toInt()
         return pinNibbles.joinToString("") { byte -> "%X".format(byte) }.substring(2, 2 + pinLength)
